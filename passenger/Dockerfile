@@ -30,7 +30,7 @@ RUN	set -ex \
 	\
 &&	passenger-config build-native-support \
 	\
-&&	apk del --purge .build-pkg \
+&&	apk del --purge .build-deps \
 &&	rm -fr /var/cache/apk/ \
 	/root/.bundle \
 	/root/.gem \
