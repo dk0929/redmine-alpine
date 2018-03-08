@@ -5,7 +5,7 @@ ENV	REDMINE_BRANCH=3.4-stable \
 	RAILS_ENV=production
 
 RUN	set -ex \
-&&	apk add --no-cache --virtual .run-deps \
+&&	apk add --virtual .run-deps --update-cache \
 	tzdata \
 	ruby \
 	ruby-bundler \
@@ -14,13 +14,14 @@ RUN	set -ex \
 	tini \
 	libressl \
 	libxml2 \
-	imagemagick6-libs \
+	imagemagick6 \
 	mariadb-client-libs \
 	postgresql-libs \
 	freetds \
 	sqlite-libs \
+&&	ln -s /usr/bin/convert-6 /usr/bin/convert \
 	\
-&&	apk add --no-cache --virtual .build-deps \
+&&	apk add --virtual .build-deps \
 	git \
 	make \
 	gcc \
@@ -34,7 +35,8 @@ RUN	set -ex \
 	freetds-dev \
 	sqlite-dev \
 	\
-&&	gem update -N --system $(ruby -e "print RUBY_VERSION") \
+&&	echo -e "install: --no-document\nupdate: --no-document\n" > /etc/gemrc \
+&&	gem update --system $(ruby -e "print RUBY_VERSION") \
 &&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git ${REDMINE_HOME} \
 &&	cd ${REDMINE_HOME} \
 &&      for adapter in mysql2 postgresql sqlserver sqlite3; do \
@@ -42,10 +44,10 @@ RUN	set -ex \
                 bundle install --without development test; \
                 mv Gemfile.lock Gemfile.lock.${adapter}; \
         done \
+&&	ln -sf /dev/stdout log/${RAILS_ENV}.log \
 	\
 &&	apk del --purge .build-deps \
-&&	rm -fr /var/cache/apk \
-        /root/.bundle \
+&&	rm -fr /root/.bundle \
         /root/.gem \
 	$(gem env gemdir)/cache \
 	config/database.yml

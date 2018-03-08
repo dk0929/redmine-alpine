@@ -1,15 +1,14 @@
 FROM dk0929/redmine-alpine:3.4-stable
 
 RUN	set -ex \
-&&	apk add --no-cache --virtual .run-deps \
+&&	apk add --virtual .run-deps --update-cache \
 	procps \
-	ruby-libs \
 	pcre \
 	zlib \
 	libressl \
 	libcurl \
 	\
-&&	apk add --no-cache --virtual .build-deps \
+&&	apk add --virtual .build-deps \
 	wget \
 	make \
 	gcc \
@@ -22,17 +21,14 @@ RUN	set -ex \
 	libressl-dev \
 	curl-dev \
 	\
-&&	gem install passenger -N \
-	\
+&&	gem install passenger \
 &&	passenger-config install-agent --skip-cache --working-dir /tmp/ --auto \
-	\
 &&	passenger-config install-standalone-runtime --skip-cache --working-dir /tmp/ --auto \
-	\
 &&	passenger-config build-native-support \
+&&	ln -sf /dev/stdout log/passenger.3000.log \
 	\
 &&	apk del --purge .build-deps \
-&&	rm -fr /var/cache/apk/ \
-	/root/.bundle \
+&&	rm -fr /root/.bundle \
 	/root/.gem \
 	$(gem env gemdir)/cache \
 	/tmp/*

@@ -2,7 +2,7 @@
 set -e
 
 case "$1" in
-	rails|rake|passenger)
+	rails|passenger)
 		adapter=$(ruby -e "
 require 'json'
 require 'yaml'
@@ -13,12 +13,12 @@ unless ENV['REDMINE_CONFIGURATION'].nil?
 end
 if File.exist?('config/database.yml')
 	conf = YAML.load_file('config/database.yml')
-	puts conf['${RAILS_ENV}']['adapter']
+	puts conf[ENV['RAILS_ENV']]['adapter']
 else
 	conf = YAML.load_file('config/database.yml.example')
 	conf.merge!(JSON.parse(ENV['REDMINE_DATABASE']||'{\"production\":{\"adapter\":\"sqlite3\",\"database\":\"db/redmien.sqlite3\"}}'))
 	YAML.dump(conf,File.open('config/database.yml','w'))
-	puts conf['${RAILS_ENV}']['adapter']
+	puts conf[ENV['RAILS_ENV']]['adapter']
 end
 		")
 		
@@ -26,11 +26,9 @@ end
 		bundle check || bundle install --without development test
 		rm -fr /root/.bundle /root/.gem $(gem env gemdir)/cache
 		
-		if [ "$1" != 'rake' ]; then
-			rake generate_secret_token
-			rake redmine:plugins:migrate
-			rake db:migrate
-		fi
+		rake generate_secret_token
+		rake redmine:plugins:migrate
+		rake db:migrate
 		
 		if [ "$1" = 'passenger' ]; then
 			set -- tini -- "$@"
