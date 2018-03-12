@@ -25,7 +25,6 @@ RUN	set -ex \
 &&	passenger-config install-agent --skip-cache --working-dir /tmp/ --auto \
 &&	passenger-config install-standalone-runtime --skip-cache --working-dir /tmp/ --auto \
 &&	passenger-config build-native-support \
-&&	ln -sf /dev/stdout log/passenger.3000.log \
 	\
 &&	apk del --purge .build-deps \
 &&	rm -fr /root/.bundle \

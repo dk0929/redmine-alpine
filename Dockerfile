@@ -4,16 +4,19 @@ ENV	REDMINE_BRANCH=3.4-stable \
 	REDMINE_HOME=/home/redmine \
 	RAILS_ENV=production
 
+WORKDIR	${REDMINE_HOME}
+
 RUN	set -ex \
 &&	apk add --virtual .run-deps --update-cache \
 	tzdata \
+	tini \
 	ruby \
-	ruby-bundler \
 	ruby-json \
 	ruby-bigdecimal \
-	tini \
 	libressl \
 	libxml2 \
+	libxslt \
+	xz-libs \
 	imagemagick6 \
 	mariadb-client-libs \
 	postgresql-libs \
@@ -29,16 +32,18 @@ RUN	set -ex \
 	ruby-dev \
 	libressl-dev \
 	libxml2-dev \
+	libxslt-dev \
+	xz-dev \
 	imagemagick6-dev \
 	mariadb-dev \
 	postgresql-dev \
 	freetds-dev \
 	sqlite-dev \
 	\
-&&	echo -e "install: --no-document\nupdate: --no-document\n" > /etc/gemrc \
+&&	echo "gem: --no-document" > /etc/gemrc \
 &&	gem update --system $(ruby -e "print RUBY_VERSION") \
-&&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git ${REDMINE_HOME} \
-&&	cd ${REDMINE_HOME} \
+&&	gem install bundler \
+&&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git . \
 &&      for adapter in mysql2 postgresql sqlserver sqlite3; do \
 		echo -e "${RAILS_ENV}:\n  adapter: ${adapter}\n" > config/database.yml; \
                 bundle install --without development test; \
@@ -48,15 +53,15 @@ RUN	set -ex \
 	\
 &&	apk del --purge .build-deps \
 &&	rm -fr /root/.bundle \
-        /root/.gem \
+	/root/.gem \
 	$(gem env gemdir)/cache \
+	.git* \
+	.*ignore \
 	config/database.yml
-
-WORKDIR	${REDMINE_HOME}
-VOLUME	${REDMINE_HOME}/files
 
 COPY	docker-entrypoint.sh /root/
 ENTRYPOINT ["sh", "/root/docker-entrypoint.sh"]
 
+VOLUME	${REDMINE_HOME}/files
 EXPOSE	3000
 CMD	["rails", "server", "-b", "0.0.0.0"]
