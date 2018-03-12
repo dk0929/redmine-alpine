@@ -49,7 +49,6 @@ RUN	set -ex \
                 bundle install --without development test; \
                 mv Gemfile.lock Gemfile.lock.${adapter}; \
         done \
-&&	ln -sf /dev/stdout log/${RAILS_ENV}.log \
 	\
 &&	apk del --purge .build-deps \
 &&	rm -fr /root/.bundle \
@@ -62,6 +61,6 @@ RUN	set -ex \
 COPY	docker-entrypoint.sh /root/
 ENTRYPOINT ["sh", "/root/docker-entrypoint.sh"]
 
-VOLUME	${REDMINE_HOME}/files
+VOLUME	["${REDMINE_HOME}/files", "${REDMINE_HOME}/log", "${REDMINE_HOME}/db"]
 EXPOSE	3000
 CMD	["rails", "server", "-b", "0.0.0.0"]
