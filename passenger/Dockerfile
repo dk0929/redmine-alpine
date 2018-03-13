@@ -26,7 +26,13 @@ RUN	set -ex \
 &&	passenger-config install-standalone-runtime --skip-cache --working-dir /tmp/ --auto \
 &&	passenger-config build-native-support \
 	\
+&&	for dir in `find $(gem env gemdir) -type f -name Makefile -exec dirname {} \;`; do \
+		cd $dir; \
+		make clean; \
+	done \
+&&	cd ${REDMINE_HOME} \
 &&	apk del --purge .build-deps \
+&&	find $(gem env gemdir) -type d -name download_cache | xargs rm -fr \
 &&	rm -fr /root/.bundle \
 	/root/.gem \
 	$(gem env gemdir)/cache \

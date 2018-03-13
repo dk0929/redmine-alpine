@@ -6,7 +6,7 @@ case "$1" in
 		adapter=$(ruby -e "
 require 'json'
 require 'yaml'
-unless ENV['REDMINE_CONFIGURATION'].nil?
+unless File.exist?('config/configuration.yml') or ENV['REDMINE_CONFIGURATION'].nil?
 	conf = YAML.load_file('config/configuration.yml.example')
 	conf.merge!(JSON.parse(ENV['REDMINE_CONFIGURATION']))
 	YAML.dump(conf,File.open('config/configuration.yml','w'))

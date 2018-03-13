@@ -50,6 +50,11 @@ RUN	set -ex \
                 mv Gemfile.lock Gemfile.lock.${adapter}; \
         done \
 	\
+&&	for dir in `find $(gem env gemdir) -type f -name Makefile -exec dirname {} \;`; do \
+		cd $dir; \
+		make clean; \
+	done \
+&&	cd ${REDMINE_HOME} \
 &&	apk del --purge .build-deps \
 &&	rm -fr /root/.bundle \
 	/root/.gem \
