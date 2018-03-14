@@ -61,11 +61,12 @@ RUN	set -ex \
 	$(gem env gemdir)/cache \
 	.git* \
 	.*ignore \
+	$(find . -type f -name delete.me) \
 	config/database.yml
 
 COPY	docker-entrypoint.sh /root/
 ENTRYPOINT ["sh", "/root/docker-entrypoint.sh"]
 
-VOLUME	["${REDMINE_HOME}/files", "${REDMINE_HOME}/log", "${REDMINE_HOME}/db"]
+VOLUME	["${REDMINE_HOME}/files", "${REDMINE_HOME}/log"]
 EXPOSE	3000
 CMD	["rails", "server", "-b", "0.0.0.0"]

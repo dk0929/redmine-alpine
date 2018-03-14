@@ -32,10 +32,10 @@ RUN	set -ex \
 	done \
 &&	cd ${REDMINE_HOME} \
 &&	apk del --purge .build-deps \
-&&	find $(gem env gemdir) -type d -name download_cache | xargs rm -fr \
 &&	rm -fr /root/.bundle \
 	/root/.gem \
 	$(gem env gemdir)/cache \
+	`find $(gem env gemdir) -type d -name download_cache` \
 	/tmp/*
 
 CMD ["passenger", "start"]
