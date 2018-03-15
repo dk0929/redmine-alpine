@@ -1,12 +1,13 @@
 FROM	alpine:latest
-
 ENV	REDMINE_BRANCH=3.4-stable \
 	REDMINE_HOME=/home/redmine \
 	RAILS_ENV=production
-
 WORKDIR	${REDMINE_HOME}
+COPY	docker-entrypoint.sh /root/
 
 RUN	set -ex \
+&&	chmod +x /root/docker-entrypoint.sh \
+	\
 &&	apk add --virtual .run-deps --update-cache \
 	tzdata \
 	tini \
@@ -56,7 +57,8 @@ RUN	set -ex \
 	done \
 &&	cd ${REDMINE_HOME} \
 &&	apk del --purge .build-deps \
-&&	rm -fr /root/.bundle \
+&&	rm -fr /var/cache/apk/* \
+	/root/.bundle \
 	/root/.gem \
 	$(gem env gemdir)/cache \
 	.git* \
@@ -64,9 +66,7 @@ RUN	set -ex \
 	$(find . -type f -name delete.me) \
 	config/database.yml
 
-COPY	docker-entrypoint.sh /root/
-ENTRYPOINT ["sh", "/root/docker-entrypoint.sh"]
-
 VOLUME	["${REDMINE_HOME}/files", "${REDMINE_HOME}/log"]
 EXPOSE	3000
+ENTRYPOINT ["/root/docker-entrypoint.sh"]
 CMD	["rails", "server", "-b", "0.0.0.0"]
