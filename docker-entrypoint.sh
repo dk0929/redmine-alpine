@@ -32,8 +32,7 @@ end
 		")
 		
 		cp Gemfile.lock.${adapter} Gemfile.lock
-		bundle check || \
-		bundle install --without development test || \
+		bundle check || bundle install --without development test
 		rm -fr /root/.bundle /root/.gem $(gem env gemdir)/cache
 		
 		if [ ! -f config/secrets.yml \
