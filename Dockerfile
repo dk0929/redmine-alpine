@@ -1,4 +1,4 @@
-FROM	alpine:latest
+FROM	alpine:3.7
 ENV	REDMINE_BRANCH=3.4-stable \
 	REDMINE_HOME=/home/redmine \
 	RAILS_ENV=production
