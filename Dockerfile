@@ -1,5 +1,5 @@
 FROM	alpine:latest
-ENV	REDMINE_BRANCH=3.4-stable \
+ENV	REDMINE_BRANCH=4.0-stable \
 	REDMINE_HOME=/home/redmine \
 	RAILS_ENV=production
 WORKDIR	${REDMINE_HOME}

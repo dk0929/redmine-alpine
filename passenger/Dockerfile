@@ -1,4 +1,4 @@
-FROM dk0929/redmine-alpine:3.4-stable
+FROM dk0929/redmine-alpine:4.0-stable
 COPY passenger-logswitch.sh /root/
 
 RUN	set -ex \
