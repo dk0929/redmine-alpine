@@ -1,4 +1,4 @@
-FROM	alpine:3.7
+FROM	alpine:latest
 ENV	REDMINE_BRANCH=3.4-stable \
 	REDMINE_HOME=/home/redmine \
 	RAILS_ENV=production
@@ -8,10 +8,13 @@ COPY	docker-entrypoint.sh /root/
 RUN	set -ex \
 &&	chmod +x /root/docker-entrypoint.sh \
 	\
-&&	apk add --virtual .run-deps --update-cache \
+&&	apk upgrade --update-cache \
+	\
+&&	apk add --virtual .run-deps \
 	tzdata \
 	tini \
 	ruby \
+	ruby-bundler \
 	ruby-json \
 	ruby-bigdecimal \
 	libressl \
@@ -19,7 +22,7 @@ RUN	set -ex \
 	libxslt \
 	xz-libs \
 	imagemagick6 \
-	mariadb-client-libs \
+	mariadb-connector-c \
 	postgresql-libs \
 	freetds \
 	sqlite-libs \
@@ -36,15 +39,14 @@ RUN	set -ex \
 	libxslt-dev \
 	xz-dev \
 	imagemagick6-dev \
-	mariadb-dev \
+	mariadb-connector-c-dev \
 	postgresql-dev \
 	freetds-dev \
 	sqlite-dev \
 	\
 &&	echo "gem: --no-document" > /etc/gemrc \
-&&	gem update --system $(ruby -e "print RUBY_VERSION") \
-&&	gem install bundler \
 &&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git . \
+&&	echo -e "\ngroup :${RAILS_ENV} do\n$(grep "\sgem\s*[\"\']puma[\"\']" Gemfile)\nend\n" >> Gemfile \
 &&      for adapter in mysql2 postgresql sqlserver sqlite3; do \
 		echo -e "${RAILS_ENV}:\n  adapter: ${adapter}\n" > config/database.yml; \
                 bundle install --without development test; \
