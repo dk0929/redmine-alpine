@@ -46,7 +46,7 @@ RUN	set -ex \
 	\
 &&	echo "gem: --no-document" > /etc/gemrc \
 &&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git . \
-&&	echo -e "\ngroup :${RAILS_ENV} do\n$(grep "\sgem\s*[\"\']puma[\"\']" Gemfile)\nend\n" >> Gemfile \
+&&	echo -e "\ngroup :${RAILS_ENV} do\n$(grep "\sgem\s\+\(\"puma\"\|\'puma\'\)" Gemfile || echo "  gem 'puma'")\nend\n" >> Gemfile \
 &&      for adapter in mysql2 postgresql sqlserver sqlite3; do \
 		echo -e "${RAILS_ENV}:\n  adapter: ${adapter}\n" > config/database.yml; \
                 bundle install --without development test; \
