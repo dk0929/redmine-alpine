@@ -14,7 +14,6 @@ RUN	set -ex \
 	tzdata \
 	tini \
 	ruby \
-	ruby-bundler \
 	ruby-json \
 	ruby-bigdecimal \
 	libressl \
@@ -45,6 +44,7 @@ RUN	set -ex \
 	sqlite-dev \
 	\
 &&	echo "gem: --no-document" > /etc/gemrc \
+&&	gem install bundler -v "<2.0.0" \
 &&	git clone -b ${REDMINE_BRANCH} https://github.com/redmine/redmine.git . \
 &&	echo -e "\ngroup :${RAILS_ENV} do\n$(grep "\sgem\s\+\(\"puma\"\|\'puma\'\)" Gemfile || echo "  gem 'puma'")\nend\n" >> Gemfile \
 &&      for adapter in mysql2 postgresql sqlserver sqlite3; do \
